@@ -112,3 +112,66 @@ function renderPins(pins) {
 }
 
 renderPins(adverts);
+
+// создание и отрисовка карточки объявления
+
+/*
+На основе первого по порядку элемента из сгенерированного массива и шаблона #card создайте DOM-элемент объявления, заполните его данными из объекта:
+Выведите заголовок объявления offer.title в заголовок .popup__title.
+Выведите адрес offer.address в блок .popup__text--address.
+Выведите цену offer.price в блок .popup__text--price строкой вида {{offer.price}}₽/ночь. Например, 5200₽/ночь.
+В блок .popup__type выведите тип жилья offer.type: Квартира для flat, Бунгало для bungalo, Дом для house, Дворец для palace.
+Выведите количество гостей и комнат offer.rooms и offer.guests в блок .popup__text--capacity строкой вида {{offer.rooms}} комнаты для {{offer.guests}} гостей. Например, 2 комнаты для 3 гостей.
+Время заезда и выезда offer.checkin и offer.checkout в блок .popup__text--time строкой вида Заезд после {{offer.checkin}}, выезд до {{offer.checkout}}. Например, заезд после 14:00, выезд до 12:00.
+В список .popup__features выведите все доступные удобства в объявлении.
+В блок .popup__description выведите описание объекта недвижимости offer.description.
+В блок .popup__photos выведите все фотографии из списка offer.photos. Каждая из строк массива photos должна записываться как src соответствующего изображения.
+Замените src у аватарки пользователя — изображения, которое записано в .popup__avatar — на значения поля author.avatar отрисовываемого объекта.
+*/
+
+var TypesMap = {
+  'palace': 'Дворец',
+  'flat': 'Квартира',
+  'house': 'Дом',
+  'bungalo': 'Бунгало',
+}
+
+var advert = adverts[0];
+
+var mapFilters = document.querySelector('.map__filters-container');
+
+function createFeatures(features) {
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < features.length; i++) {
+    var feature = document.createElement('li');
+    feature.classList.add('popup__feature');
+    feature.classList.add('popup__feature--' + features[i]);
+    fragment.appendChild(feature);
+  }
+  return fragment;
+}
+
+function createAdvertCard(ad) {
+  var template = document.querySelector('#card').content.querySelector('.map__card');
+  var card = template.cloneNode(true);
+  var features = createFeatures(ad.offer.features);
+
+  card.querySelector('.popup__avatar').src = ad.author.avatar;
+  card.querySelector('.popup__title').textContent = ad.offer.title;
+  card.querySelector('.popup__text--address').textContent = ad.offer.address;
+  card.querySelector('.popup__text--price').textContent = ad.offer.price + '₽/ночь';
+  card.querySelector('.popup__type').textContent = TypesMap[ad.offer.type];
+  card.querySelector('.popup__text--capacity').textContent = ad.offer.rooms + ' для ' + ad.offer.guests + ' гостей';
+  card.querySelector('.popup__text--time').textContent = 'Заезд после ' + ad.offer.checkin + ', выезд до ' + ad.offer.checkout;
+  card.querySelector('.popup__features').innerHTML = '';
+  card.querySelector('.popup__features').appendChild(features);
+  card.querySelector('.popup__description').textContent = ad.offer.description;
+  return card;
+}
+
+function renderAdvertCard(ad) {
+  var card = createAdvertCard(ad);
+  mapFilters.insertAdjacentElement('beforebegin', card);
+}
+
+renderAdvertCard(advert);
